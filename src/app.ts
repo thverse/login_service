@@ -4,15 +4,16 @@ import IndexRoutes from './routes/indexRoutes';
 import LoginRoutes from './routes/loginRoutes';
 import expressSession from 'express-session';
 import cookieParser from 'cookie-parser';
+import * as bodyParser from 'body-parser';
 import connectRedis from 'connect-redis';
 import redis from 'redis';
+
 const RedisStore = connectRedis(expressSession);
 
 
 declare module 'express-session' {
     interface SessionData {
-        auth: boolean,
-        count: number
+        auth: boolean
     }
 }
 
@@ -37,13 +38,20 @@ export class App {
         this.app.use(morgan('dev')); 
         this.app.use(express.json());
         this.app.use(cookieParser());
+        this.app.use(
+          express.urlencoded({
+            extended: false,
+          }),
+        );
         this.app.use(expressSession({
             secret: 'my server key',       
             resave: false,
             saveUninitialized:true,
             store: new RedisStore({client: redis.createClient(6379, "localhost")})
         }));
-         
+
+    
+   
         
         
     }
