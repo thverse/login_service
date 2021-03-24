@@ -1,8 +1,20 @@
 import express, { Application } from 'express';
 import morgan from 'morgan';
 import IndexRoutes from './routes/indexRoutes';
+import LoginRoutes from './routes/loginRoutes';
 import expressSession from 'express-session';
 import cookieParser from 'cookie-parser';
+import connectRedis from 'connect-redis';
+import redis from 'redis';
+const RedisStore = connectRedis(expressSession);
+
+
+declare module 'express-session' {
+    interface SessionData {
+        auth: boolean,
+        count: number
+    }
+}
 
 
 export class App {
@@ -27,18 +39,18 @@ export class App {
         this.app.use(cookieParser());
         this.app.use(expressSession({
             secret: 'my server key',       
-            resave: true,
-            saveUninitialized:true
+            resave: false,
+            saveUninitialized:true,
+            store: new RedisStore({client: redis.createClient(6379, "localhost")})
         }));
          
         
-        
-        출처: https://3dmpengines.tistory.com/1870 [3DMP]
         
     }
 
     private initRoutes(){
         this.app.use(IndexRoutes);
+        this.app.use(LoginRoutes);
     }
 
     async listen(){
