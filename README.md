@@ -1,1 +1,7 @@
-# login_service
+# login_with_session
+
+--
+
+* typescript
+* expressJS
+* redis
