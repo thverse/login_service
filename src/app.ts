@@ -1,10 +1,10 @@
 import express, { Application } from 'express';
 import morgan from 'morgan';
 import IndexRoutes from './routes/indexRoutes';
-import LoginRoutes from './routes/loginRoutes';
+import LoginRoutes from './routes/authRoutes';
+import ProfileRoutes from './routes/profileRoutes';
 import expressSession from 'express-session';
 import cookieParser from 'cookie-parser';
-import * as bodyParser from 'body-parser';
 import connectRedis from 'connect-redis';
 import redis from 'redis';
 
@@ -47,6 +47,9 @@ export class App {
             secret: 'my server key',       
             resave: false,
             saveUninitialized:true,
+            cookie: {
+                maxAge : 1000 * 60
+            },
             store: new RedisStore({client: redis.createClient(6379, "localhost")})
         }));
 
@@ -59,6 +62,7 @@ export class App {
     private initRoutes(){
         this.app.use(IndexRoutes);
         this.app.use(LoginRoutes);
+        this.app.use(ProfileRoutes);
     }
 
     async listen(){
